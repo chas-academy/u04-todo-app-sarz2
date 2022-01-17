@@ -2,7 +2,6 @@
 
 $db = new PDO('mysql:host=mariadb;dbname=tutorial', 'tutorial', 'secret');
 $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-$connection = mysqli_connect('mariadb', 'tutorial', 'secret', 'tutorial');
 
 if(isset($_POST['submit'])){
     $title = $_POST['title'];
@@ -22,8 +21,7 @@ if(isset($_POST['updatesubmit'])){
     $title = $_POST['newtitle'];
     $todo = $_POST['newtodo'];
     $id = $_POST['id'];
-    //$id1 = strval($id);
-    //changeTask($id, $title, $todo);
+    changeTask($id, $title, $todo);
 }
 
 if(isset($_POST['delete'])){
@@ -31,19 +29,16 @@ if(isset($_POST['delete'])){
     deleteTask($id);
 }
 
-/*function changeTask(int $id, string $newtitle, string $newtodo):void{
-  // global $connection;
+function changeTask(int $id, string $newtitle, string $newtodo):void{
 global $db;
-  /* $newtitle = mysqli_real_escape_string($connection, $newtitle);
-$newtodo = mysqli_real_escape_string($connection, $newtodo);*/
-/*$query = 'UPDATE todoapp SET title = :title AND task = :task WHERE id = :id';
+$query = "UPDATE todoapp SET title = :title, task = :task WHERE id = :id";
 
     $statement = $db->prepare($query);
-    $statement->bindValue('id', $id);
-    $statement->bindValue('title', $newtitle);
-    $statement->bindValue('task', $newtodo);
+    $statement->bindParam(':id', $id);
+    $statement->bindParam(':title', $newtitle,);
+    $statement->bindParam(':task', $newtodo);
     $statement->execute();
-}*/
+}
 
 function deleteTask(int $id){
     global $db;
@@ -71,7 +66,7 @@ function deleteTask(int $id){
 <body>
     <div class="header">Todo List</div>
 <h1>ADD NEW TASK</h1>
-    <form class="inputtask" action="index.php" method="post">
+    <form action="index.php" method="post">
         <input class="form" type="text" name="title" placeholder="Enter Title"> <br>
         <input class="form" type="text" name="todo" placeholder="Enter What To Do"> <br>
         <input class="button" type="submit" name="submit">
@@ -120,7 +115,8 @@ foreach($query as $row){
             
             ?>
             </select><br>
-            <input class="button" type="submit" name="delete" placeholder="Delete">
+            <input class="button" type="submit" name="delete">
     </form>
+    <script type="text/javascript" src="js/script.js"></script>
 </body>
 </html> 
