@@ -34,7 +34,7 @@ SQL;
         <input type="text" placeholder="Enter new username" name="newUsername">
         <input type="text" name="newPassword" placeholder="Enter new password">
         <input type="email" name="newEmail" placeholder="Enter your email">
-        <input type="submit">
+        <input type="submit" name="submit">
     </form>
     
 </body>

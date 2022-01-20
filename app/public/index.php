@@ -2,10 +2,15 @@
 
 $db = new PDO('mysql:host=mariadb;dbname=tutorial', 'tutorial', 'secret');
 $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+$errors = "";
+
 
 if(isset($_POST['submit'])){
     $title = $_POST['title'];
     $todo = $_POST['todo'];
+     if(empty($title) || empty($todo)){
+        $errors = "You must fill in the task title:{$title}, todo:{$todo}";
+    } else{ 
 $query = <<<SQL
 INSERT INTO todoapp(title,task)
 VALUES (?, ?)
@@ -14,6 +19,8 @@ SQL;
     $statement->bindParam(1, $title);
     $statement->bindParam(2, $todo);
     $statement->execute();
+
+}
 }
 
 
@@ -24,8 +31,8 @@ if(isset($_POST['updatesubmit'])){
     changeTask($id, $title, $todo);
 }
 
-if(isset($_POST['delete'])){
-    $id = $_POST['id'];
+if(isset($_GET['del_task'])){
+    $id = $_GET['del_task'];
     deleteTask($id);
 }
 
@@ -67,56 +74,45 @@ function deleteTask(int $id){
     <div class="header">Todo List</div>
 <h1>ADD NEW TASK</h1>
     <form action="index.php" method="post">
-        <input class="form" type="text" name="title" placeholder="Enter Title"> <br>
-        <input class="form" type="text" name="todo" placeholder="Enter What To Do"> <br>
+        <?php if(isset($errors)){ ?>
+            <p><?php echo $errors; ?></p>
+            <?php } ?>
+        <input class="task_input" type="text" name="title" placeholder="Enter Title"> <br>
+        <input class="task_input" type="text" name="todo" placeholder="Enter What To Do"> <br>
         <input class="button" type="submit" name="submit">
     </form>
-    <div class="tasks">
-    <h2>TASKS:</h2><br>
-    <?php $query = $db->query('SELECT * FROM todoapp');
-
-foreach($query as $row){
-    ?>
-    <span>Title: </span> <?php echo $row['title'];?><br>
-    <span>Description: </span> <?php echo $row['task'];?><br>
-    <span>ID: </span> <?php echo $row['id'];?><br>
-
-<?php
-}
-?>
-</div>
-    <form action="index.php" method="post">
-        <h2>Enter the id of the task you would like to update</h2>
-        <select name="id" id="">
-            <?php 
-            $query = $db->query('SELECT * FROM todoapp');
+    <h2>TASKS:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Task</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php $query = $db->query('SELECT * FROM todoapp');
 
             foreach($query as $row){
-                $id = $row['id'];
-                echo "<option value ='$id'>$id</option>";
-            }
-            
             ?>
-        </select><br>
-        <input class="form" type="text" name="newtitle" placeholder="Update Title"> <br>
-        <input class="form" type="text" name="newtodo" placeholder="Update What To Do"> <br>
-        <input class="button" type="submit" name="updatesubmit">
-    </form>
-    <form action="index.php" method="post">
-    <h2>Enter the id of the task you would like to delete</h2>
-        <select name="id" id="">
-            <?php 
-            $query = $db->query('SELECT * FROM todoapp');
-
-            foreach($query as $row){
-                $id = $row['id'];
-                echo "<option value ='$id'>$id</option>";
+            <tr>
+                <td><?php echo $row['id'];?></td>
+                <td class="task"><?php echo $row['title'];?></td>
+                <td class="task"><?php echo $row['task'];?></td>
+                <td class="update"> 
+                    <a href="update.php?upd_task=<?php echo $row['id']; ?>">UPDATE</a>
+                    <td class="delete">
+                    <a href="index.php?del_task=<?php echo $row['id']; ?>">x</a>
+                </td>
+                </td>
+            </tr>
+            <?php
             }
-            
             ?>
-            </select><br>
-            <input class="button" type="submit" name="delete">
-    </form>
+        </tbody>
+    </table>
     <script type="text/javascript" src="js/script.js"></script>
 </body>
 </html> 
