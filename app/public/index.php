@@ -4,12 +4,12 @@ $db = new PDO('mysql:host=mariadb;dbname=tutorial', 'tutorial', 'secret');
 $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 $errors = "";
 
-
+//Function for adding a new task when form is filled
 if(isset($_POST['submit'])){
     $title = $_POST['title'];
     $todo = $_POST['todo'];
      if(empty($title) || empty($todo)){
-        $errors = "You must fill in the task title:{$title}, todo:{$todo}";
+        $errors = "You must fill in the tasks";
     } else{ 
 $query = <<<SQL
 INSERT INTO todoapp(title,task)
@@ -23,28 +23,10 @@ SQL;
 }
 }
 
-
-if(isset($_POST['updatesubmit'])){
-    $title = $_POST['newtitle'];
-    $todo = $_POST['newtodo'];
-    $id = $_POST['id'];
-    changeTask($id, $title, $todo);
-}
-
+//Function for deleting task
 if(isset($_GET['del_task'])){
     $id = $_GET['del_task'];
     deleteTask($id);
-}
-
-function changeTask(int $id, string $newtitle, string $newtodo):void{
-global $db;
-$query = "UPDATE todoapp SET title = :title, task = :task WHERE id = :id";
-
-    $statement = $db->prepare($query);
-    $statement->bindParam(':id', $id);
-    $statement->bindParam(':title', $newtitle,);
-    $statement->bindParam(':task', $newtodo);
-    $statement->execute();
 }
 
 function deleteTask(int $id){
@@ -67,7 +49,7 @@ function deleteTask(int $id){
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
     <title>Document</title>
 </head>
 <body>
@@ -90,6 +72,7 @@ function deleteTask(int $id){
                 <th>Task</th>
                 <th>Edit</th>
                 <th>Delete</th>
+                <th>Done</th>
             </tr>
         </thead>
         <tbody>
@@ -103,9 +86,12 @@ function deleteTask(int $id){
                 <td class="task"><?php echo $row['task'];?></td>
                 <td class="update"> 
                     <a href="update.php?upd_task=<?php echo $row['id']; ?>">UPDATE</a>
-                    <td class="delete">
+                </td>
+                <td class="delete">
                     <a href="index.php?del_task=<?php echo $row['id']; ?>">x</a>
                 </td>
+                <td class="done">
+                    <button type="button">✔</button>                
                 </td>
             </tr>
             <?php
@@ -113,6 +99,18 @@ function deleteTask(int $id){
             ?>
         </tbody>
     </table>
-    <script type="text/javascript" src="js/script.js"></script>
+    <script type="text/javascript" src="js/script.js"></script> 
+    <script>
+    (function() {
+        let buttons = document.getElementsByClassName("done");
+        for(let i = 0; i < buttons.length; i++){
+            if(buttons[i]){
+                 buttons[i].addEventListener('click', () => changeColor(buttons[i]))
+                 function changeColor(doneElement){
+                 if(doneElement.parentElement){
+                     doneElement.parentElement.style.backgroundColor = 'green';
+        }}}}
+    })()
+    </script>
 </body>
 </html> 

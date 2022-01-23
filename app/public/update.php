@@ -1,17 +1,18 @@
 <?php
 $db = new PDO('mysql:host=mariadb;dbname=tutorial', 'tutorial', 'secret');
 $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
+$id;
 
  if(isset($_POST['updatesubmit'])){
     $title = $_POST['newtitle'];
     $todo = $_POST['newtodo'];
-    changeTask($title, $todo);
+    global $id;
+    var_dump($id);
+    changeTask($id, $title, $todo);
 }
 
-function changeTask(string $newtitle, string $newtodo):void{
+function changeTask(int $id, string $newtitle, string $newtodo):void{
     global $db;
-    global $id;
     $query = "UPDATE todoapp SET title = :title, task = :task WHERE id = :id";
     
         $statement = $db->prepare($query);
@@ -36,7 +37,8 @@ function changeTask(string $newtitle, string $newtodo):void{
 <table>
     <?php
     if(isset($_GET['upd_task'])){
-        $id = $_GET['upd_task'];
+      global $id;
+      $id = $_GET['upd_task'];
         ?>
                 <thead>
             <tr>
@@ -58,6 +60,7 @@ function changeTask(string $newtitle, string $newtodo):void{
                 ?>
             <tr>
                 <td><?php echo $row['id'];?></td>
+
                 <td class="task"><?php echo $row['title'];?></td>
                 <td class="task"><?php echo $row['task'];?></td>
             </tr>
