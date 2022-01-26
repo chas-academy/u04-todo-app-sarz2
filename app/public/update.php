@@ -1,26 +1,15 @@
 <?php
-$db = new PDO('mysql:host=mariadb;dbname=tutorial', 'tutorial', 'secret');
-$db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-$id;
+include 'db.php';
+include 'functions.php';
 
+if(isset($_GET['upd_task'])){
+    $id = $_GET['upd_task'];
  if(isset($_POST['updatesubmit'])){
     $title = $_POST['newtitle'];
     $todo = $_POST['newtodo'];
-    global $id;
-    var_dump($id);
     changeTask($id, $title, $todo);
-}
+}}
 
-function changeTask(int $id, string $newtitle, string $newtodo):void{
-    global $db;
-    $query = "UPDATE todoapp SET title = :title, task = :task WHERE id = :id";
-    
-        $statement = $db->prepare($query);
-        $statement->bindParam(':id', $id);
-        $statement->bindParam(':title', $newtitle,);
-        $statement->bindParam(':task', $newtodo);
-        $statement->execute();
-    }
  
 ?>
 
@@ -34,10 +23,10 @@ function changeTask(int $id, string $newtitle, string $newtodo):void{
     <title>UPDATE</title>
 </head>
 <body>
+<div class="header">Update Task</div>
 <table>
     <?php
     if(isset($_GET['upd_task'])){
-      global $id;
       $id = $_GET['upd_task'];
         ?>
                 <thead>
@@ -71,14 +60,32 @@ function changeTask(int $id, string $newtitle, string $newtodo):void{
         }
     }
         ?>
+ <?php
+    if(isset($_GET['upd_task'])){
+      $id = $_GET['upd_task'];
 
+      global $db;
+      $statement = $db->prepare("SELECT * FROM todoapp WHERE id=:id");
+      $statement->bindParam('id', $id, PDO::PARAM_INT);
+      $statement->execute();
 
-<form action="update.php" method="post">
+      if($statement->rowCount() > 0) {
+
+          while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+        ?>
+
+<form action="update.php?upd_task=<?php echo $_GET['upd_task'] ?>" method="post">
               </select><br>
-        <input class="task_input" type="text" name="newtitle" placeholder="Update Title"> <br>
-        <input class="task_input" type="text" name="newtodo" placeholder="Update What To Do"> <br>
-        <input class="button" type="submit" name="updatesubmit">
+        <input class="task_input" type="text" name="newtitle" value="<?php echo $row['title'];?>"> <br>
+        <input class="task_input" type="text" name="newtodo" value="<?php echo $row['task'];?>"> <br>
+       <input class="button" type="submit" name="updatesubmit"></a>
     </form>
+    <?php
+            }
+      }
+    }
 
+        ?>
+<a href="index.php"><button class="button">Go back to first page</button></a>
 </body>
 </html>

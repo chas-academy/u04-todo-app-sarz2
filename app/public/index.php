@@ -1,41 +1,31 @@
 <?php 
-
-$db = new PDO('mysql:host=mariadb;dbname=tutorial', 'tutorial', 'secret');
-$db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+include 'db.php';
+include 'functions.php';
 $errors = "";
 
-//Function for adding a new task when form is filled
+if(isset($_POST['done'])){
+    $done = 1;
+    $query = 'UPDATE todoapp SET isDone = :isDone';
+    $statement = $db->prepare($query);
+        $statement->bindValue(':isDone', $done);
+        $statement->execute();
+
+}
+
+//Query for adding a new task when form is filled
 if(isset($_POST['submit'])){
     $title = $_POST['title'];
     $todo = $_POST['todo'];
      if(empty($title) || empty($todo)){
         $errors = "You must fill in the tasks";
     } else{ 
-$query = <<<SQL
-INSERT INTO todoapp(title,task)
-VALUES (?, ?)
-SQL;
-    $statement = $db->prepare($query);
-    $statement->bindParam(1, $title);
-    $statement->bindParam(2, $todo);
-    $statement->execute();
+        addTask($title, $todo);
 
-}
-}
+}}
 
-//Function for deleting task
 if(isset($_GET['del_task'])){
     $id = $_GET['del_task'];
     deleteTask($id);
-}
-
-function deleteTask(int $id){
-    global $db;
-    $query = 'DELETE FROM todoapp WHERE id = :id';
-    $statement = $db->prepare($query);
-    $statement->bindValue('id', $id);
-    $statement->execute();
-
 }
 
 ?>
@@ -49,7 +39,7 @@ function deleteTask(int $id){
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/styles.css"/>
     <title>Document</title>
 </head>
 <body>
@@ -91,7 +81,7 @@ function deleteTask(int $id){
                     <a href="index.php?del_task=<?php echo $row['id']; ?>">x</a>
                 </td>
                 <td class="done">
-                    <button type="button">✔</button>                
+                    <button name="done" type="submit">✔</button>                
                 </td>
             </tr>
             <?php
@@ -101,7 +91,7 @@ function deleteTask(int $id){
     </table>
     <script type="text/javascript" src="js/script.js"></script> 
     <script>
-    (function() {
+     (function() {
         let buttons = document.getElementsByClassName("done");
         for(let i = 0; i < buttons.length; i++){
             if(buttons[i]){
@@ -111,6 +101,6 @@ function deleteTask(int $id){
                      doneElement.parentElement.style.backgroundColor = 'green';
         }}}}
     })()
-    </script>
+    </script> 
 </body>
 </html> 
