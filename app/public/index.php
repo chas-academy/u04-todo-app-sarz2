@@ -3,14 +3,15 @@ include 'db.php';
 include 'functions.php';
 $errors = "";
 
-if(isset($_POST['done'])){
-    $done = 1;
-    $query = 'UPDATE todoapp SET isDone = :isDone';
+if(isset($_GET['check_task'])){
+    $id = $_GET['check_task'];
+    $query = 'UPDATE todoapp SET isDone = ABS(isDone - 1) WHERE id = :id';
     $statement = $db->prepare($query);
-        $statement->bindValue(':isDone', $done);
+        $statement->bindValue(':id', $id);
         $statement->execute();
 
 }
+
 
 //Query for adding a new task when form is filled
 if(isset($_POST['submit'])){
@@ -57,7 +58,6 @@ if(isset($_GET['del_task'])){
     <table>
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Title</th>
                 <th>Task</th>
                 <th>Edit</th>
@@ -70,8 +70,17 @@ if(isset($_GET['del_task'])){
 
             foreach($query as $row){
             ?>
-            <tr>
-                <td><?php echo $row['id'];?></td>
+            <?php 
+            if($row['isDone'] == 1){
+            ?> 
+                <tr class="markAsDone">
+            <?php 
+            } else {
+            ?>
+                <tr>
+            <?php 
+            }
+            ?>
                 <td class="task"><?php echo $row['title'];?></td>
                 <td class="task"><?php echo $row['task'];?></td>
                 <td class="update"> 
@@ -81,7 +90,7 @@ if(isset($_GET['del_task'])){
                     <a href="index.php?del_task=<?php echo $row['id']; ?>">x</a>
                 </td>
                 <td class="done">
-                    <button name="done" type="submit">✔</button>                
+                    <a href="index.php?check_task=<?php echo $row['id']; ?>" name="done" >✓</a>                
                 </td>
             </tr>
             <?php
@@ -89,18 +98,5 @@ if(isset($_GET['del_task'])){
             ?>
         </tbody>
     </table>
-    <script type="text/javascript" src="js/script.js"></script> 
-    <script>
-     (function() {
-        let buttons = document.getElementsByClassName("done");
-        for(let i = 0; i < buttons.length; i++){
-            if(buttons[i]){
-                 buttons[i].addEventListener('click', () => changeColor(buttons[i]))
-                 function changeColor(doneElement){
-                 if(doneElement.parentElement){
-                     doneElement.parentElement.style.backgroundColor = 'green';
-        }}}}
-    })()
-    </script> 
 </body>
 </html> 

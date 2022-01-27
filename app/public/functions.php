@@ -14,8 +14,8 @@ function deleteTask(int $id){
 function addTask(string $title, string $todo){
 global $db;
 $query = <<<SQL
-INSERT INTO todoapp(title,task)
-VALUES (?, ?)
+INSERT INTO todoapp(title,task,isDone)
+VALUES (?, ?, 0)
 SQL;
     $statement = $db->prepare($query);
     $statement->bindParam(1, $title);
